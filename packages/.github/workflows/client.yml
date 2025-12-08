@@ -5,8 +5,7 @@ env:
 on:
   push:
     branches:
-      - master
-
+      - main
 jobs:
   build:
     name: Lint code with ESLint

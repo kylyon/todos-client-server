@@ -11,6 +11,8 @@ jobs:
         with:
           node-version: '22.x'
 
+      - uses: cd packages/server
+
       - name: Install dependencies
         run: npm install
 

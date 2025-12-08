@@ -28,7 +28,7 @@ jobs:
           run: npm run lint
 
         - name: Run Frontend Tests with Coverage
-          run: npm run test --if-present --coverage.enabled true
+          run: npm run test --coverage.enabled true --if-present
         - name: 'Report Coverage'
           if: always() 
           uses:  davelosert/vitest-coverage-report-action@v2

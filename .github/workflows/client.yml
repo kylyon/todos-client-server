@@ -31,13 +31,10 @@ jobs:
         - name: Run Frontend Tests with Coverage
           run: npm run test --coverage.enabled true
         - name: 'Report Coverage'
-          if: always() 
-          uses:  davelosert/vitest-coverage-report-action@v2
+          uses: actions/upload-artifact@v4
           with:
-            name: 'Frontend'
-            threshold-icons: "{0: '🔴', 80: '🟠', 90: '🟢'}"
-            json-summary-path: 'coverage/coverage-summary-frontend.json' 
-            json-final-path: 'coverage/coverage-final-frontend.json'
+            name: coverage-report-frontend
+            path: packages/client/coverage/
 
         - name: Deploy to Vercel
           uses: amondnet/vercel-action@v25
@@ -45,5 +42,5 @@ jobs:
             vercel-token: ${{ secrets.VERCEL_TOKEN }}
             vercel-args: '--prod'
             working-directory: ./packages/client
-            vercel-project-id: ${{ secrets.FRONTEND_VERCEL_PROJECT_ID }}
-            vercel-org-id: ${{ secrets.FRONTEND_VERCEL_ORG_ID }}
+            vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+            vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}

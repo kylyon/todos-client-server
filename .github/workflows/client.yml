@@ -51,7 +51,7 @@ jobs:
           run: npm ci
 
         - name: Npm Audit
-          run: npm audit --audit-level=high
+          run: npm audit fix --audit-level=high
 
   # Deploy Frontend to Vercel
   deploy-frontend:

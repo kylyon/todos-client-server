@@ -1,0 +1,49 @@
+name: "Déploy Client to Vercel"
+on:
+  push:
+    branches:
+      - main
+      - dancodeur
+
+jobs:
+  #Deploy Frontend to Vercel
+  deploy-frontend:
+    name: Deploy Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./packages/client
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+
+        - name: Setup Node.js
+          uses: actions/setup-node@v4
+          with:
+            node-version: lts/*
+
+        - name: Install dependencies
+          run: npm ci
+        
+        - name: Check code quality with ESLint
+          run: npm run lint
+
+        - name: Run Frontend Tests with Coverage
+          run: npm run test --coverage.enabled --coverage.provider=istanbul
+        - name: 'Report Coverage'
+          if: always() 
+          uses:  davelosert/vitest-coverage-report-action@v2
+          with:
+            name: 'Frontend'
+            threshold-icons: "{0: '🔴', 80: '🟠', 90: '🟢'}"
+            json-summary-path: 'coverage/coverage-summary-frontend.json'
+            json-final-path: 'coverage/coverage-final-frontend.json'
+
+        - name: Deploy to Vercel
+          uses: amondnet/vercel-action@v25
+          with:
+            vercel-token: ${{ secrets.VERCEL_TOKEN }}
+            vercel-args: '--prod'
+            working-directory: ./packages/client
+            vercel-project-id: ${{ secrets.FRONTEND_VERCEL_PROJECT_ID }}
+            vercel-org-id: ${{ secrets.FRONTEND_VERCEL_ORG_ID }}

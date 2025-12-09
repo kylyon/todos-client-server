@@ -6,6 +6,16 @@ Projet CI/CD Mastère Lead Developper Full Stack
 #### Alerte Discord : [Lien du serveur discord](https://discord.gg/u9fnSswM)
 ![Discord notification](./packages/client/public/discord_notify.png)
 
+### Observabilité Sentry 
+###
+#### Dashboard UI
+![Observabilité avec Sentry](./packages/server/public/sentry.png)
+#### Webhook 
+```shell
+https://todos-server-node.onrender.com/failed
+```
+##### Exemple de réponse 
+![Observabilité avec Sentry](./packages/server/public/locahost_sentry_failed.png)
 ## Website
 1. Frontend : [todos](https://todos-client-server-gl0dta55u-dancodeurs-projects.vercel.app/)
 2. Backend : [Server Todos](https://todos-server-node.onrender.com/)

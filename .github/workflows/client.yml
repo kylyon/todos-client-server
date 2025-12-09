@@ -31,11 +31,6 @@ jobs:
       - name: Validate PR commits with commitlint
         if: github.event_name == 'pull_request'
         run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
-      # Discord Notification
-      - name: Jobs (Check frontend lint commit)
-        uses: tenzin1308/discord-notification@v1.0.0
-        with:
-          discord-webhook-url: ${{secrets.WEBHOOKS_URL}}
 
   security-scan-npm:
     name: Check frontend security-scan
@@ -56,12 +51,15 @@ jobs:
           run: npm ci
 
         - name: Npm Audit
-          run: npm audit fix --audit-level=high
-        # Discord Notification
-        - name: Jobs (lints-commit)
-          uses: tenzin1308/discord-notification@v1.0.0
-          with:
-            discord-webhook-url: ${{secrets.WEBHOOKS_URL}}
+          run: npm audit --audit-level=high
+        - name: Notify discord
+          uses: th0th/notify-discord@v0.4.1
+          if: ${{ always() }}
+          env:
+            DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+            GITHUB_ACTOR: ${{ github.actor }}
+            GITHUB_JOB_NAME: "Build and deploy"
+            GITHUB_JOB_STATUS: ${{ job.status }}
 
   # Deploy Frontend to Vercel
   deploy-frontend:
@@ -101,8 +99,11 @@ jobs:
             working-directory: ./packages/client
             vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
             vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-        # Discord Notification
-        - name: Jobs (deploy-frontend)
-          uses: tenzin1308/discord-notification@v1.0.0
-          with:
-            discord-webhook-url: ${{secrets.WEBHOOKS_URL}}
+        - name: Notify discord
+          uses: th0th/notify-discord@v0.4.1
+          if: ${{ always() }}
+          env:
+            DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+            GITHUB_ACTOR: ${{ github.actor }}
+            GITHUB_JOB_NAME: "Build and deploy"
+            GITHUB_JOB_STATUS: ${{ job.status }}

@@ -1,5 +1,11 @@
 name: server-ci
-on: [push, pull_request, release]
+on:
+  push:
+    tags:
+      - "*"
+  pull_request:
+    branches: ["main"]
+
 jobs:
   security-scan-npm:
     name: Security Scan NPM
@@ -25,6 +31,7 @@ jobs:
   test-unit:
     name: Unit Test Backend
     runs-on: ubuntu-latest
+    needs: security-scan-npm
     defaults:
       run:
         working-directory: ./packages/server
@@ -83,9 +90,7 @@ jobs:
 
   build-docker:
     name: Build Docker Image
-    if: github.event_name != 'push'
     runs-on: ubuntu-latest
-    environment: production
     steps: 
       - uses: actions/checkout@v4
 
@@ -102,7 +107,40 @@ jobs:
           file: Dockerfile
           push:  github.event_name == 'release'
           platforms: linux/amd64
+          outputs: ${{ github.event_name == 'pull_request' && 'type=docker,dest=/tmp/image.tar' || '' }}
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKERHUB_PROJECT_NAME }}:${{ github.ref_name }}
             ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKERHUB_PROJECT_NAME }}:latest
           cache-from: type=local,src=/tmp/.buildx-cache
+      
+      - name: Upload artifact
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: /tmp/image.tar
+          retention-days: 1
+
+  security-scan-docker:
+    needs: build-docker
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+          path: /tmp
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          input: /tmp/image.tar 
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL'

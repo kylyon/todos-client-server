@@ -1,4 +1,4 @@
-import {vi, describe, expect, it, beforeEach, Mocked} from 'vitest'
+import {vi, describe, expect, it, beforeEach} from 'vitest'
 import {addTodo, deleteTodo, getAllTodos, toggleTodo} from '../src/todos'
 import { readTodos, writeTodos } from '../src/storage'
 

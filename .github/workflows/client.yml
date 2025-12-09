@@ -20,7 +20,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Install commitlint
-        run: npm install -D @commitlint/cli @commitlint/config-conventional
+        run: npm install --save-dev @commitlint/cli @commitlint/config-conventional
       - name: Print versions
         run: |
           git --version
@@ -30,7 +30,7 @@ jobs:
       # Check with Pull Request...
       - name: Validate PR commits with commitlint
         if: github.event_name == 'pull_request'
-        run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+        run: npx commitlint --from origin/main --to HEAD
 
   security-scan-npm:
     name: Check frontend security-scan
@@ -51,14 +51,14 @@ jobs:
           run: npm ci
 
         - name: Npm Audit
-          run: npm audit --audit-level=high
+          run: npm audit fix --audit-level=high
         - name: Notify discord
           uses: th0th/notify-discord@v0.4.1
           if: ${{ always() }}
           env:
-            DISCORD_WEBHOOK_URL: ${{ secrets.WEBHOOKS_URL }}
+            DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
             GITHUB_ACTOR: ${{ github.actor }}
-            GITHUB_JOB_NAME: "Build and deploy"
+            GITHUB_JOB_NAME: "security-scan-npm"
             GITHUB_JOB_STATUS: ${{ job.status }}
 
   # Deploy Frontend to Vercel
@@ -103,7 +103,7 @@ jobs:
           uses: th0th/notify-discord@v0.4.1
           if: ${{ always() }}
           env:
-            DISCORD_WEBHOOK_URL: ${{ secrets.WEBHOOKS_URL }}
+            DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
             GITHUB_ACTOR: ${{ github.actor }}
-            GITHUB_JOB_NAME: "Build and deploy"
+            GITHUB_JOB_NAME: "deploy-frontend"
             GITHUB_JOB_STATUS: ${{ job.status }}

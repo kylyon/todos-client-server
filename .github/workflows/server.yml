@@ -183,8 +183,8 @@ jobs:
           RENDER_ID: ${{needs.deploy-backend.outputs.renderId}}
         run: |
           set -e
-          STATUS=(curl -H "Authorization:Bearer{{ secrets.RENDER_API_KEY }}" "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys/$RENDER_ID" | jq ".status")
-          if [ "$STATUS" != "succeeded" ]; then
+          STATUS=$(curl -H "Authorization:Bearer{{ secrets.RENDER_API_KEY }}" "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys/$RENDER_ID" | jq -r ".status")
+          if [ "$STATUS" != "live" ]; then
           exit 1
           fi
       - name: Notify discord

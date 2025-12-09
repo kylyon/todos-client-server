@@ -115,12 +115,11 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./packages/server
-          file: Dockerfile
+          file: ./packages/server/Dockerfile
           push:  ${{ github.event_name == 'release' }}
           platforms: linux/amd64
           outputs: ${{ github.event_name == 'pull_request' && 'type=docker,dest=/tmp/image.tar' || '' }}
           tags: ${{ steps.meta.outputs.tags }}
-          cache-from: type=local,src=/tmp/.buildx-cache
       
       - name: Upload artifact
         if: github.event_name == 'pull_request'

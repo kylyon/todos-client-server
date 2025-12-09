@@ -156,7 +156,8 @@ jobs:
   
   deploy-backend:
     name: Deploy Backend to Render
-    needs: security-scan-docker
+    needs: build-docker
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Render Deploy Hook

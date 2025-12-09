@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/node";
+import "../instrument.js";
 import express from 'express';
 import cors from 'cors';
 import { getAllTodos, addTodo, toggleTodo, deleteTodo } from './todos.js';
@@ -27,6 +29,12 @@ app.patch('/api/todos/:id', async (req, res) => {
 app.delete('/api/todos/:id', async (req, res) => {
   const result = await deleteTodo(req.params.id);
   res.json(result);
+});
+
+// Intégration de l'observabilité avec SENTRY
+Sentry.setupExpressErrorHandler(app);
+app.get("/failed", function mainHandler(req, res) {
+  throw new Error("My first Sentry error!");
 });
 
 app.listen(PORT, () => {

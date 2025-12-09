@@ -120,7 +120,6 @@ jobs:
           platforms: linux/amd64
           outputs: ${{ github.event_name == 'pull_request' && 'type=docker,dest=/tmp/image.tar' || '' }}
           tags: ${{ steps.meta.outputs.tags }}
-          cache-from: type=local,src=/tmp/.buildx-cache
       
       - name: Upload artifact
         if: github.event_name == 'pull_request'

@@ -4,11 +4,58 @@ on:
     branches:
       - main
       - dancodeur
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  #Deploy Frontend to Vercel
+  # Lint-commits
+  lints-commit:
+    name: Check frontend lint commit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./packages/client
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install commitlint
+        run: npm install -D @commitlint/cli @commitlint/config-conventional
+      - name: Print versions
+        run: |
+          git --version
+          node --version
+          npm --version
+          npx commitlint --version
+      # Check with Pull Request...
+      - name: Validate PR commits with commitlint
+        if: github.event_name == 'pull_request'
+        run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+
+  security-scan-npm:
+    name: Check frontend security-scan
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./packages/client
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+
+        - name: Setup Node.js
+          uses: actions/setup-node@v4
+          with:
+            node-version: lts/*
+
+        - name: Install dependencies
+          run: npm ci
+
+        - name: Npm Audit
+          run: npm audit fix --audit-level=high
+
+  # Deploy Frontend to Vercel
   deploy-frontend:
-    name: Deploy Frontend
+    name: Check frontend code quality and Deploy to Vercel
     runs-on: ubuntu-latest
     defaults:
       run:

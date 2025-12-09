@@ -166,7 +166,10 @@ jobs:
       - name: Trigger Render Deploy Hook
         id: trigger
         run: |
-          echo "renderId=" & curl ${{ secrets.RENDER_DEPLOY_HOOK }}&imgURL=${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKERHUB_PROJECT_NAME }}:${{ github.ref_name }} | jq ".deploy .id" >>  "$GITHUB_OUTPUT"
+          set -e
+          REPONSE=$(curl ${{ secrets.RENDER_DEPLOY_HOOK }}&imgURL=${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKERHUB_PROJECT_NAME }}:${{ github.ref_name }})
+          RENDER_ID=$(echo "$RESPONSE" | jq -r '.deploy.id')
+          echo "renderId=$RENDER_ID" >> "$GITHUB_OUTPUT"
 
   smoke-test:
     name: Check if Docker Image is live
@@ -175,13 +178,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - env:
-          renderId: ${{needs.deploy-backend.outputs.renderId}}
-
       - name: Trigger Render API to retrieve deploy status
+        env:
+          RENDER_ID: ${{needs.deploy-backend.outputs.renderId}}
         run: |
-          curl https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys/${{ renderId }} | jq ".status"
-      
+          set -e
+          STATUS=(curl -H "Authorization:Bearer{{ secrets.RENDER_API_KEY }}" "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys/$RENDER_ID" | jq ".status")
+          if [ "$STATUS" != "succeeded" ]; then
+          exit 1
+          fi
       - name: Notify discord
         uses: th0th/notify-discord@v0.4.1
         if: ${{ success() }}

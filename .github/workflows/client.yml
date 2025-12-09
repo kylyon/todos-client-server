@@ -35,8 +35,8 @@ jobs:
           with:
             name: 'Frontend'
             threshold-icons: "{0: '🔴', 80: '🟠', 90: '🟢'}"
-            json-summary-path: './coverage/coverage-summary-frontend.json'
-            json-final-path: './coverage/coverage-final-frontend.json'
+            # json-summary-path: './coverage/coverage-summary-frontend.json'
+            # json-final-path: './coverage/coverage-final-frontend.json'
 
         - name: Deploy to Vercel
           uses: amondnet/vercel-action@v25

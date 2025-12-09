@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import 'dotenv/config'
 import {
   fetchTodos,
   createTodo,
@@ -6,7 +7,7 @@ import {
   removeTodo
 } from '../src/api/todos';
 
-const API_URL = 'http://localhost:3001/api/todos';
+const API_URL = import.meta.env.VITE_API_URL;
 
 beforeEach(() => {
   vi.resetAllMocks();

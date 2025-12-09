@@ -4,6 +4,7 @@ FROM node:24 AS build
 WORKDIR /usr/src/app
 
 COPY package*.json .
+COPY instrument.js . 
 
 RUN npm install
 
@@ -20,7 +21,7 @@ COPY --from=build /usr/src/app/dist ./dist
 COPY --from=build /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/package*.json ./
 COPY --from=build /usr/src/app/src/data ./dist/data
-COPY --from=build /usr/src/app/src/dist/instrument.js ./dist/instrument.js
+COPY --from=build /usr/src/app/instrument.js ./instrument.js
 
 EXPOSE 3001
 

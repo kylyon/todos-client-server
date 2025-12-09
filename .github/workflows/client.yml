@@ -41,6 +41,6 @@ jobs:
           with:
             vercel-token: ${{ secrets.VERCEL_TOKEN }}
             vercel-args: '--prod'
-            working-directory: ./
+            working-directory: /packages/client
             vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
             vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}

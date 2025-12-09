@@ -1,12 +1,10 @@
 name: "Déploy Client to Vercel"
 on:
   push:
-    branches:
-      - main
-      - dancodeur
+    tags:
+      - "*"
   pull_request:
-    branches:
-      - main
+    branches: ["main"]
 
 jobs:
   # Lint-commits
@@ -60,7 +58,6 @@ jobs:
             GITHUB_ACTOR: ${{ github.actor }}
             GITHUB_JOB_NAME: "security-scan-npm"
             GITHUB_JOB_STATUS: ${{ job.status }}
-
   # Deploy Frontend to Vercel
   deploy-frontend:
     name: Check frontend code quality and Deploy to Vercel
@@ -68,6 +65,8 @@ jobs:
     defaults:
       run:
         working-directory: ./packages/client
+    needs: security-scan-npm
+    if: github.event_name == 'push'
     steps:
         - name: Checkout code
           uses: actions/checkout@v4

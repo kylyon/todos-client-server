@@ -7,5 +7,17 @@ export default defineConfig({
   
   optimizeDeps: {
     exclude: ['lucide-react'],
+  }, 
+  test: {
+    coverage: {
+      provider: "istanbul",
+      reportsDirectory: "coverage",
+      reporter:[
+        ["json-summary", { file: "coverage-summary-frontend.json" }],
+        ["json", { file: "coverage-final-frontend.json" }]
+      ],
+      reportOnFailure: true,
+      extension: [".ts", ".tsx"]
+    }
   }
 });

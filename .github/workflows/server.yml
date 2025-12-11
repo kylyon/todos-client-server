@@ -165,10 +165,32 @@ jobs:
     steps:
       - name: Trigger Render Deploy Hook
         id: trigger
+        env:
+          SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+          API_KEY: ${{ secrets.RENDER_API_KEY }}
+          IMAGE_URL: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKERHUB_PROJECT_NAME }}:${{ github.ref_name }}
         run: |
           set -e
-          REPONSE=$(curl ${{ secrets.RENDER_DEPLOY_HOOK }}&imgURL=${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKERHUB_PROJECT_NAME }}:${{ github.ref_name }})
+          echo "🚀 Déclenchement du déploiement via API..."
+          
+          # 1. On utilise l'API POST (et pas le Hook) pour avoir une réponse JSON propre
+          # On force l'image URL dans le body de la requête
+          RESPONSE=$(curl -s -X POST \
+            --url "https://api.render.com/v1/services/${SERVICE_ID}/deploys" \
+            --header "Authorization: Bearer ${API_KEY}" \
+            --header "Content-Type: application/json" \
+            --data "{\"imageUrl\": \"${IMAGE_URL}\"}")
+
+          # 2. Vérification que la réponse contient bien un ID
           RENDER_ID=$(echo "$RESPONSE" | jq -r '.deploy.id')
+          
+          if [[ "$RENDER_ID" == "null" || -z "$RENDER_ID" ]]; then
+            echo "❌ Erreur: Pas d'ID reçu. Réponse API:"
+            echo "$RESPONSE"
+            exit 1
+          fi
+
+          echo "✅ ID récupéré : $RENDER_ID"
           echo "renderId=$RENDER_ID" >> "$GITHUB_OUTPUT"
 
   smoke-test:
@@ -183,12 +205,12 @@ jobs:
           RENDER_ID: ${{needs.deploy-backend.outputs.renderId}}
         run: |
           set -e
-          echo "🔍 Suivi du déploiement ID: $RENDER_ID"
+          echo "🔍 Suivi du déploiement ID: ${RENDER_ID}"
           
           # Boucle infinie (avec timeout implicite de GitHub Actions ~6h)
           while true; do
             STATUS=$(curl -s --request GET \
-              --url "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys/$RENDER_ID" \
+              --url "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys/${RENDER_ID}" \
               --header "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" | jq -r ".status")
             
             echo "Statut actuel : $STATUS"

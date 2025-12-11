@@ -1,8 +1,8 @@
 name: server-ci
 on:
   push:
-    tags:
-      - "*"
+    tags: 
+      "*"
   pull_request:
     branches: ["main"]
 
@@ -175,9 +175,7 @@ jobs:
           
           # 1. On utilise l'API POST (et pas le Hook) pour avoir une réponse JSON propre
           # On force l'image URL dans le body de la requête
-          RESPONSE=$(curl -s -X POST \
-            --url " ${{ secrets.RENDER_DEPLOY_HOOK }}&imgURL=${IMAGE_URL}"
-            --header "Content-Type: application/json"
+          RESPONSE=$(curl "${{ secrets.RENDER_DEPLOY_HOOK }}&imgURL=${IMAGE_URL}")
 
           # 2. Vérification que la réponse contient bien un ID
           RENDER_ID=$(echo "$RESPONSE" | jq -r '.deploy.id')

@@ -183,11 +183,29 @@ jobs:
           RENDER_ID: ${{needs.deploy-backend.outputs.renderId}}
         run: |
           set -e
-          STATUS=$(curl --request GET --url https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys/${{ env.RENDER_ID }} --header 'authorization: Bearer ${{ secrets.RENDER_API_KEY }}' | jq -r ".status")
-          if [ "$STATUS" != "live" ]; then
-          echo "$STATUS"
-          exit 1
-          fi
+          echo "🔍 Suivi du déploiement ID: $RENDER_ID"
+          
+          # Boucle infinie (avec timeout implicite de GitHub Actions ~6h)
+          while true; do
+            STATUS=$(curl -s --request GET \
+              --url "https://api.render.com/v1/services/${{ RENDER_SERVICE_ID }}/deploys/${{ RENDER_ID }}" \
+              --header "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" | jq -r ".status")
+            
+            echo "Statut actuel : $STATUS"
+
+            if [ "$STATUS" == "live" ]; then
+              echo "✅ Le service est en ligne (live) !"
+              exit 0
+            fi
+
+            if [[ "$STATUS" == "build_failed" || "$STATUS" == "update_failed" || "$STATUS" == "canceled" ]]; then
+              echo "❌ Le déploiement a échoué."
+              exit 1
+            fi
+
+            # Attendre 10 secondes avant de revérifier
+            sleep 10
+          done
 
       - name: Notify discord
         uses: th0th/notify-discord@v0.4.1

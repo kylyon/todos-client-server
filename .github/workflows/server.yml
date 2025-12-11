@@ -188,7 +188,7 @@ jobs:
           # Boucle infinie (avec timeout implicite de GitHub Actions ~6h)
           while true; do
             STATUS=$(curl -s --request GET \
-              --url "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys/${ RENDER_ID }" \
+              --url "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys/$RENDER_ID" \
               --header "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" | jq -r ".status")
             
             echo "Statut actuel : $STATUS"

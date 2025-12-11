@@ -1,7 +1,7 @@
 name: server-ci
 on:
   push:
-    tag: 
+    tags: 
       "*"
   pull_request:
     branches: ["main"]

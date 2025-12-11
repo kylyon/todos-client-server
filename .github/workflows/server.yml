@@ -1,7 +1,8 @@
 name: server-ci
 on:
   push:
-    branches: ["kyllian"]
+    tag: 
+      "*"
   pull_request:
     branches: ["main"]
 

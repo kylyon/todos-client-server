@@ -177,6 +177,7 @@ jobs:
           # On force l'image URL dans le body de la requête
           RESPONSE=$(curl "${{ secrets.RENDER_DEPLOY_HOOK }}&imgURL=${IMAGE_URL}")
 
+          echo "$RESPONSE"
           # 2. Vérification que la réponse contient bien un ID
           RENDER_ID=$(echo "$RESPONSE" | jq -r '.deploy.id')
           

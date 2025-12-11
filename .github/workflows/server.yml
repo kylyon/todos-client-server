@@ -173,7 +173,7 @@ jobs:
           
           # 1. On utilise l'API POST (et pas le Hook) pour avoir une réponse JSON propre
           # On force l'image URL dans le body de la requête
-          RESPONSE=$(curl "${{ secrets.RENDER_DEPLOY_HOOK }}&imgURL=${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKERHUB_PROJECT_NAME }}:${{ github.ref_name }}")
+          RESPONSE=$(curl ${{ secrets.RENDER_DEPLOY_HOOK }}&imgURL=${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKERHUB_PROJECT_NAME }}:${{ github.ref_name }})
 
           echo "$RESPONSE"
           # 2. Vérification que la réponse contient bien un ID

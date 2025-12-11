@@ -182,7 +182,12 @@ jobs:
         env:
           RENDER_ID: ${{needs.deploy-backend.outputs.renderId}}
         run: |
-          curl --request GET --url https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys/$RENDER_ID --header 'authorization: Bearer ${{ secrets.RENDER_API_KEY }}'
+          set -e
+          STATUS=$(curl --request GET --url https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys/${{ env.RENDER_ID }} --header 'authorization: Bearer ${{ secrets.RENDER_API_KEY }}' | jq -r ".status")
+          if [ "$STATUS" != "live" ]; then
+          echo "$STATUS"
+          exit 1
+          fi
 
       - name: Notify discord
         uses: th0th/notify-discord@v0.4.1

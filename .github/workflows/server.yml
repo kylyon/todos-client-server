@@ -229,7 +229,7 @@ jobs:
         if: ${{ success() }}
         with:
           webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          title: ✅ Déploiement v${{ github.ref_name }} OK
+          title: ✅ Déploiement du backend v${{ github.ref_name }} OK
           message: "**Le service est en ligne**\n**Creator:** ${{ github.actor }}"
           avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
           username: Projet CI/CD
@@ -239,7 +239,7 @@ jobs:
         if: ${{ failure() }}
         with:
           webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          title: ❌ BUILD ECHOUÉ sur v${{ github.ref_name }}
+          title: ❌ DEPLOIEMENT DU BACKEND ECHOUÉ sur v${{ github.ref_name }}
           message: "**Le déploiement a échoué.**\n**Creator:** ${{ github.actor }}"
           avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
           username: Projet CI/CD

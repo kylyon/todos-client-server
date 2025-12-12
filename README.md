@@ -5,6 +5,9 @@ Projet CI/CD Mastère Lead Developper Full Stack
 
 #### Alerte Discord : [Lien du serveur discord](https://discord.gg/u9fnSswM)
 ![Discord notification](./packages/client/public/discord_notify.png)
+<img width="292" height="138" alt="image" src="https://github.com/user-attachments/assets/799c5a21-4aa0-4046-9afe-82dffce3507b" />
+
+
 
 ### Observabilité Sentry 
 ###

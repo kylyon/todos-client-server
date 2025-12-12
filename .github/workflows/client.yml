@@ -17,8 +17,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Install commitlint
-        run: npm install --save-dev @commitlint/cli @commitlint/config-conventional
+        run: | 
+          npm install --save-dev @commitlint/cli @commitlint/config-conventional && \
+          echo "export default { extends: ['@commitlint/config-conventional'] };" > commitlint.config.mjs
       - name: Print versions
         run: |
           git --version

@@ -102,11 +102,23 @@ jobs:
             working-directory: ./packages/client
             vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
             vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-        - name: Notify discord
-          uses: th0th/notify-discord@v0.4.1
-          if: ${{ always() }}
-          env:
-            DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-            GITHUB_ACTOR: ${{ github.actor }}
-            GITHUB_JOB_NAME: "deploy-frontend"
-            GITHUB_JOB_STATUS: ${{ job.status }}
+        
+        - name: Successful Deploy
+          uses: stegzilla/discord-notify@v2
+          if: ${{ success() }}
+          with:
+            webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+            title: ✅ Déploiement du frontend v${{ github.ref_name }} OK
+            message: "**Le service est en ligne**\n**Creator:** ${{ github.actor }}"
+            avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+            username: Projet CI/CD
+        
+        - name: Build Failed
+          uses: stegzilla/discord-notify@v2
+          if: ${{ failure() }}
+          with:
+            webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+            title: ❌ DEPLOIEMENT DU FRONTEND ECHOUÉ sur v${{ github.ref_name }}
+            message: "**Le déploiement a échoué.**\n**Creator:** ${{ github.actor }}"
+            avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+            username: Projet CI/CD
